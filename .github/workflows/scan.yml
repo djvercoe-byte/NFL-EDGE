@@ -1,0 +1,52 @@
+name: NFL edge scan
+
+on:
+  schedule:
+    # GitHub cron is UTC and has no time zones, so each Pacific slot is listed for both PDT and PST.
+    # The script only runs inside the real Pacific window and waits until the exact minute.
+    - cron: "7 23 * * 4"   # Thu 4:07pm PDT  -> report 4:30pm
+    - cron: "7 0 * * 5"    # Thu 4:07pm PST  -> report 4:30pm
+    - cron: "37 0 * * 0"   # Sat 5:37pm PDT  -> report 6:00pm
+    - cron: "37 1 * * 0"   # Sat 5:37pm PST  -> report 6:00pm
+    - cron: "37 2 * * 1"   # Sun 7:37pm PDT  -> report 8:00pm
+    - cron: "37 3 * * 1"   # Sun 7:37pm PST  -> report 8:00pm
+  workflow_dispatch:
+    inputs:
+      push:
+        description: "Send a phone notification"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run scanner
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.push }}" = "true" ]; then python -m scanner.run --force; else python -m scanner.run --force --no-push; fi
+          else
+            python -m scanner.run
+          fi
+      - name: Save report and paper-trading ledger
+        run: |
+          git config user.name "nfl-edge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs state
+          git diff --cached --quiet || git commit -m "Report $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
