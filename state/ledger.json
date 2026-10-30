@@ -1,0 +1,21 @@
+{
+ "bankroll_start": 100.0,
+ "bets": [
+  {
+   "key": "asc-nfl-ne-mia-2026-11-01-neg-14pt5|long",
+   "kind": "single",
+   "run": "2026-10-30-manual",
+   "label": "NE -14.5",
+   "game": "NE @ MIA",
+   "game_slug": "nfl-ne-mia-2026-11-01",
+   "slug": "asc-nfl-ne-mia-2026-11-01-neg-14pt5",
+   "side": "long",
+   "type": "SPREAD",
+   "kickoff": "2026-11-01T21:25:00+00:00",
+   "cost": 0.2734,
+   "p": 0.2947,
+   "stake": 1.0,
+   "result": null
+  }
+ ]
+}
