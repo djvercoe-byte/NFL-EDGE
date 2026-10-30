@@ -277,7 +277,7 @@ def main():
     ])
     gen = datetime.now(PT).strftime("%a %b %-d, %-I:%M %p PT")
     ctx = {"picks": picks, "parlays": parlays, "scorecard": sc, "moves": moves, "liq": liq, "status": status,
-           "slot_name": SLOTS.get(slot, (0, 0, 0, "Manual run"))[3] + " report", "slot_short": SLOTS.get(slot, (0, 0, 0, "Manual"))[3].split(" ")[0][:3],
+           "slot_name": SLOTS.get(slot, (0, 0, 0, "Manual run"))[3] + " report", "slot_short": SLOTS.get(slot, (0, 0, 0, "Test"))[3].split(" ")[0][:3],
            "generated": gen, "week": cur_week, "n_games": len(games), "n_markets": n_markets, "n_priced": len(cands)}
     page = report.render(ctx)
     os.makedirs(os.path.join(DOCS, "reports"), exist_ok=True)
