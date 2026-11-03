@@ -44,7 +44,7 @@ def log_picks(led, picks, parlays, run_key):
             "key": key, "kind": "single", "run": run_key, "label": p["label"], "game": p["game"],
             "game_slug": p["game_slug"], "slug": p["slug"], "side": p["side"], "type": p["type"],
             "kickoff": p["kickoff"].isoformat(), "cost": round(p["cost"], 4), "p": round(p["p"], 4),
-            "stake": stake, "result": None,
+            "stake": stake, "result": None, "voters": p.get("voters") or {},
         })
         added += 1
     for pl in parlays[:3]:

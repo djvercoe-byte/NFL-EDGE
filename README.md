@@ -19,6 +19,16 @@ Parlays combine qualifying legs from **different games in the same week**. The p
 that still makes each parlay worth it, because Polymarket sets combo prices in the app. Nothing stays open past
 Monday Night Football.
 
+## Extra voters
+Three more signals nudge each bet's fair chance (by at most 4 points combined), on top of the two that must agree:
+- **Line movement**: how the sportsbook consensus moved since the week's first report (lines that move tend to keep drifting).
+- **News/injury**: ESPN's live injury report and headlines. Props for players listed out/doubtful are dropped; questionable
+  players, a starting QB out, or a top receiver out (more targets for teammates) nudge the related bets.
+- **Weather**: wind above 12 mph, rain and hard cold lower expected points and passing numbers at outdoor stadiums.
+
+Each voter is scored when bets settle and its trust weight moves between 0.25x and 1.5x, so the report's
+"Extra voters' track record" table shows which ones are earning their keep. State lives in `state/voters.json`.
+
 ## Paper trading
 Every pick is logged to `state/ledger.json` against a $100 paper bankroll (quarter-Kelly, max 3% per bet) and
 graded from Polymarket's own settlement. The scorecard on each report shows actual vs. expected results.

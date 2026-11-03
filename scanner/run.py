@@ -9,7 +9,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from . import engine, ledger, report, sources
+from . import engine, ledger, report, sources, voters
 from .statsmodel import (GAMES_URL, PlayerModel, build_distributions, injuries_url, read_csv_text,
                          stats_url, team_ratings)
 from .teams import TEAMS, norm_abbr, short
@@ -157,6 +157,8 @@ def main():
     except Exception as ex:
         status.append(f"Sportsbook lines unavailable: {ex}")
     log(f"Consensus for {len(cons)} games; credits remaining {odds.remaining}")
+    vst = voters.load_state(os.path.join(STATE, "voters.json"))
+    voters.record_lines(vst, cons, now_utc)
 
     # props: limited games to stay inside the free Odds API allowance
     def prop_priority(g):
@@ -183,6 +185,7 @@ def main():
 
     # ---------------------------------------------------------------- flags: weather, QB injuries, neutral sites
     flags = {}
+    wx_by_game, team_qb = {}, {}
     sched = {}
     for gr in games_csv:
         if gr["season"] == str(season):
@@ -197,6 +200,7 @@ def main():
         if not neutral and team_roof == "open" and roof not in ("dome", "closed"):
             w = sources.weather_at(TEAMS[g["home"]][2], TEAMS[g["home"]][3], g["kickoff"])
             if w:
+                wx_by_game[g["slug"]] = w
                 temp, wind, rain = w
                 if wind >= 15:
                     f["notes"].append(f"wind {wind:.0f} mph forecast")
@@ -208,6 +212,8 @@ def main():
                     f["notes"].append(f"cold ({temp:.0f}°F)")
         for side, col in (("away", "away_qb_name"), ("home", "home_qb_name")):
             qb = row.get(col)
+            if qb:
+                team_qb[g[side]] = qb
             st = players.injury_status(qb) if qb else ""
             if st:
                 f["notes"].append(f"{short(g[side])} QB {qb} listed {st}")
@@ -223,6 +229,25 @@ def main():
         cands.extend(out)
         for k in sk:
             skipped[k] += sk[k]
+    # ---------------------------------------------------------------- extra voters: line movement, news/injury, weather
+    injuries = {}
+    try:
+        injuries = voters.parse_espn_injuries(sources.espn_injuries())
+    except Exception as ex:
+        status.append(f"ESPN injury report unavailable ({ex}); news/injury voter used the nflverse report only.")
+    for nm_, rec_ in players.injury.items() if hasattr(players, "injury") else []:
+        if nm_ not in injuries and rec_ and rec_[0] >= cur_week - 1:
+            injuries[nm_] = {"status": rec_[1], "team": players.team_of.get(nm_, ""), "pos": "", "name": nm_}
+    names = {voters.norm_name(c["player"]): c["player"] for c in cands if c.get("player")}
+    names.update({voters.norm_name(q_): q_ for q_ in team_qb.values()})
+    try:
+        voters.apply_espn_news(injuries, sources.espn_news(), now_utc, names)
+    except Exception as ex:
+        status.append(f"ESPN news unavailable ({ex}).")
+    n_before = len(cands)
+    cands = voters.apply(cands, vst, dists, cons, injuries, team_qb, players, wx_by_game)
+    if n_before - len(cands):
+        status.append(f"News/injury voter dropped {n_before - len(cands)} prop sides for players listed out or doubtful.")
     picks = engine.select_picks(cands, flags)
 
     # liquidity check on the picks (order book)
@@ -263,6 +288,7 @@ def main():
         return ev_cache[slug]
 
     graded = ledger.grade(led, get_event, now_utc)
+    n_voter = voters.learn(vst, led)
     added = ledger.log_picks(led, picks, parlays, run_key)
     sc = ledger.scorecard(led)
     log(f"Graded {graded}, logged {added}; record {sc['wins']}-{sc['losses']}")
@@ -274,11 +300,13 @@ def main():
         f"Skipped {skipped['no_fair']} markets with no sportsbook price and {skipped['suspect']} that looked mis-mapped.",
         f"The Odds API credits remaining this month: {odds.remaining if odds.remaining is not None else 'unknown'}.",
         f"Stats model: {ratings['n_games']} games this season (+ fading weight on last season); home field {ratings['hfa']:.1f} pts.",
+        f"Extra voters: lines tracked for {len(vst['lines'])} games, {len(injuries)} injury listings, weather for {len(wx_by_game)} "
+        f"outdoor games; {n_voter} voter calls scored on newly settled bets.",
     ])
     gen = datetime.now(PT).strftime("%a %b %-d, %-I:%M %p PT")
     ctx = {"picks": picks, "parlays": parlays, "scorecard": sc, "moves": moves, "liq": liq, "status": status,
            "slot_name": SLOTS.get(slot, (0, 0, 0, "Manual run"))[3] + " report", "slot_short": SLOTS[slot][3][:3] if slot in SLOTS else "Test",
-           "generated": gen, "week": cur_week, "n_games": len(games), "n_markets": n_markets, "n_priced": len(cands)}
+           "generated": gen, "week": cur_week, "n_games": len(games), "n_markets": n_markets, "n_priced": len(cands), "voters": vst}
     page = report.render(ctx)
     os.makedirs(os.path.join(DOCS, "reports"), exist_ok=True)
     with open(os.path.join(DOCS, "index.html"), "w") as f:
@@ -304,6 +332,7 @@ def main():
 
     save_json(os.path.join(STATE, "prices.json"), {"run": run_key, "prices": cur_prices})
     ledger.save(os.path.join(STATE, "ledger.json"), led)
+    voters.save_state(os.path.join(STATE, "voters.json"), vst)
     meta.update({"last_run_key": run_key if slot != "manual" else meta.get("last_run_key"),
                  "last_run_at": now_utc.isoformat(), "odds_remaining": odds.remaining})
     save_json(os.path.join(STATE, "meta.json"), meta)

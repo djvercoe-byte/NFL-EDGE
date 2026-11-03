@@ -2,6 +2,8 @@
 import html
 from zoneinfo import ZoneInfo
 
+from . import voters as _voters
+
 PT = ZoneInfo("America/Los_Angeles")
 
 
@@ -48,7 +50,8 @@ def pick_card(p, i, moves, liq):
     model_bits = ""
     if m:
         model_bits = f" · model avg {m.get('mean')} over {m.get('games')} games"
-    notes = "".join(f"<li>{e(n)}</li>" for n in p["notes"])
+    vtxt = _voters.describe(p)
+    notes = "".join(f"<li>{e(n)}</li>" for n in p["notes"] + ([vtxt] if vtxt else []))
     verdict_cls = {"Worth it": "good", "Small edge": "warn"}.get(p["verdict"], "bad")
     return f"""
 <article class="card">
@@ -110,6 +113,21 @@ td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}detail
 """
 
 
+def voter_table(st):
+    if not st:
+        return ""
+    rows = ""
+    for k in _voters.VOTERS:
+        rec = st["record"].get(k, {"right": 0, "n": 0})
+        hit = pct(rec["right"] / rec["n"], 0) if rec["n"] else "–"
+        rows += (f"<tr><td>{e(_voters.NICE[k])}</td><td>{st['weights'].get(k, 0):.2f}x</td>"
+                 f"<td>{rec['right']}-{rec['n'] - rec['right']}</td><td>{hit}</td></tr>")
+    return ("<h2>Extra voters' track record</h2><div class=\"card\"><div class=\"meta\">Each voter nudges a bet's fair "
+            "chance. When bets settle it's scored on whether it pushed the right way, and its trust weight moves "
+            "up or down (0.25x-1.5x).</div><table><tr><th>Voter</th><th>Trust</th><th>Right-Wrong</th><th>Hit rate</th></tr>"
+            f"{rows}</table></div>")
+
+
 def render(ctx):
     picks, parlays, sc = ctx["picks"], ctx["parlays"], ctx["scorecard"]
     cards = "".join(pick_card(p, i + 1, ctx["moves"], ctx["liq"]) for i, p in enumerate(picks)) or \
@@ -140,6 +158,7 @@ def render(ctx):
 <div><label>ROI</label><b>{pct(sc['roi'])}</b><small>actual</small></div>
 <div><label>Expected</label><b>{money(sc['exp_pnl'])}</b><small>what the edges predicted</small></div>
 </div>{f'<table><tr><th>Type</th><th>W-L</th><th>P/L</th><th>ROI</th></tr>{rows}</table>' if rows else '<div class="meta">Grading starts once this week\'s games settle.</div>'}</div>
+{voter_table(ctx.get("voters"))}
 <details><summary>How to read this</summary>
 <p><b>Buy at</b> is the live Polymarket US price for that side; the American odds include Polymarket's taker fee.
 <b>Fair chance</b> blends the de-vigged sportsbook consensus (70%) with an independent stats model (30%). A bet only appears when

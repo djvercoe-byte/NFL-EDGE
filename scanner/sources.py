@@ -1,4 +1,4 @@
-"""Network fetchers: Polymarket US public gateway, The Odds API, nflverse, Open-Meteo."""
+"""Network fetchers: Polymarket US public gateway, The Odds API, nflverse, Open-Meteo, ESPN."""
 import gzip
 import json
 import time
@@ -121,3 +121,16 @@ def weather_at(lat, lon, when_utc):
         return temp, wind, rain
     except Exception:
         return None
+
+
+# ----------------------------------------------------------------------------- ESPN (public, no key)
+
+ESPN = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/"
+
+
+def espn_injuries():
+    return get_json(ESPN + "injuries", retries=2, timeout=30)
+
+
+def espn_news():
+    return get_json(ESPN + "news", {"limit": 100}, retries=2, timeout=30)

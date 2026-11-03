@@ -331,6 +331,7 @@ def evaluate_game(game, cons, dists, ratings, players, prop_cons, flags):
                 "edge_m": None if p_m is None else p_m - cost, "dist_sd": dist_sd, "combo": m["combo"],
                 "spread_width": None if mid is None else m["ask"] - m["bid"], "info": info,
                 "player": m.get("player"), "kind": m.get("kind"), "dir": _direction(m, side),
+                "mkt": {k: m[k] for k in ("long_team", "away_line", "line", "team") if k in m},
             })
     return out, skipped
 
