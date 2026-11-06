@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Bot Barn</title>
+<meta name="theme-color" content="#1d3f7a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bot Barn">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone-first tycoon app — one column of rounded "company" cards, big income headline, fixed bottom tab bar */
+:root{
+  --bg:#eef2f7; --panel:#ffffff; --panel-2:#e4eaf3; --fg:#141a26; --muted:#6a7487; --line:#d6dde8;
+  --accent:#2563eb; --accent-soft:#dbe6fd;
+  --up:#14955f; --down:#d6453d;
+  --hero-a:#1fae9a; --hero-b:#1d3f7a; --hero-c:#1a1650; --hero-fg:#ffffff;
+  --c-stocks:#f2a93b; --c-crypto:#8b5cf6; --c-sports:#ef6b5b; --c-other:#3aa3c9;
+  --display:"Bricolage Grotesque", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow:0 1px 2px rgba(20,30,60,.06), 0 6px 20px rgba(20,30,60,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c111b; --panel:#151c2a; --panel-2:#1d2638; --fg:#eaf0fa; --muted:#93a0b6; --line:#28324a;
+  --accent:#6b9bff; --accent-soft:#1d2a4a; --up:#3ccf8e; --down:#ff7a70;
+  --hero-a:#138a7b; --hero-b:#183466; --hero-c:#120f3c; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c111b; --panel:#151c2a; --panel-2:#1d2638; --fg:#eaf0fa; --muted:#93a0b6; --line:#28324a;
+  --accent:#6b9bff; --accent-soft:#1d2a4a; --up:#3ccf8e; --down:#ff7a70;
+  --hero-a:#138a7b; --hero-b:#183466; --hero-c:#120f3c; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+html,body{background:var(--bg);margin:0}
+:root{padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{overscroll-behavior-y:contain;-webkit-tap-highlight-color:transparent}
+body{color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(96px + env(safe-area-inset-bottom,0px))}
+.num{font-variant-numeric:tabular-nums}
+h1{font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:-.02em;margin:0;line-height:1.05}
+h2{font-family:var(--display);font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0;font-weight:600}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.seg{display:inline-flex;background:var(--panel-2);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 13px var(--body);padding:7px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--accent);box-shadow:var(--shadow)}
+button:focus-visible,a:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hero{background:var(--panel);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px}
+.hero .big{padding:22px 22px 14px}
+.hero .amt{font-family:var(--display);font-weight:800;font-size:clamp(34px,10vw,46px);letter-spacing:-.02em;line-height:1}
+.hero .lbl{margin-top:8px;font-weight:600;font-size:14px}
+.hero .strip{display:flex;border-top:1px solid var(--line);background:var(--panel-2)}
+.hero .strip div{flex:1;padding:10px 14px;min-width:0}
+.hero .strip div+div{border-left:1px solid var(--line)}
+.strip small{display:block;color:var(--muted);font-size:12px}
+.strip b{font-size:15px}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+.section-h{display:flex;justify-content:space-between;align-items:baseline;margin:22px 4px 10px}
+.section-h span{color:var(--muted);font-size:18px;font-family:var(--display)}
+.list{display:grid;gap:12px}
+.card{display:grid;grid-template-columns:52px 1fr 28px;gap:14px;align-items:center;background:var(--panel);border-radius:18px;padding:16px;box-shadow:var(--shadow);cursor:pointer;border:0;text-align:left;color:inherit;font:inherit;width:100%}
+.card:hover{transform:translateY(-1px)}
+.ico{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.ico svg{width:26px;height:26px}
+.card .meta{min-width:0}
+.card .nm{font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card .sub{color:var(--muted);font-size:14px}
+.card .facts{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:8px 0 4px}
+.card .rate{font-family:var(--display);font-weight:800;font-size:22px}
+.card .rate small{font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted)}
+.chev{width:28px;height:28px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;color:var(--muted)}
+.pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--panel-2);color:var(--muted)}
+.pill.real{background:var(--accent-soft);color:var(--accent)}
+.pill.warn{background:color-mix(in srgb,var(--down) 15%,transparent);color:var(--down)}
+.empty{background:var(--panel);border-radius:18px;padding:22px;color:var(--muted);text-align:center;box-shadow:var(--shadow)}
+.empty b{display:block;color:var(--fg);font-size:16px;margin-bottom:4px}
+/* fortune */
+.bar{display:flex;gap:4px;height:14px;margin:18px 0 18px}
+.bar i{border-radius:6px;min-width:6px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;background:var(--panel);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.tile i{width:14px;flex:none}
+.tile div{padding:10px 12px;min-width:0}
+.tile small{color:var(--muted);display:block;font-size:13px}
+.tile b{font-size:17px}
+.tile em{font-style:normal;font-size:12px;display:block}
+/* stats panel */
+.stats{background:linear-gradient(115deg,var(--hero-a),var(--hero-b) 60%,var(--hero-c));color:var(--hero-fg);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.stats h2{font-size:28px;margin-bottom:10px}
+.stats h4{font-family:var(--display);font-size:22px;margin:22px 0 6px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:16px}
+.row b{font-weight:700;text-align:right}
+.stats .row span{opacity:.92}
+.stats .up{color:#8ff0c3}.stats .down{color:#ffb3ad}
+/* detail */
+.back{display:inline-flex;align-items:center;gap:8px;border:0;background:none;color:var(--fg);font:800 24px var(--display);cursor:pointer;padding:4px 0;margin-bottom:12px}
+.panel{background:var(--panel);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.stack{display:grid;gap:12px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kv div{background:var(--panel-2);border-radius:12px;padding:10px 12px;min-width:0}
+.kv small{color:var(--muted);display:block;font-size:12px}
+.kv b{font-size:16px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+tr:last-child td{border-bottom:0}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.note{color:var(--muted);font-size:13px}
+.link{color:var(--accent);font-weight:600;text-decoration:none}
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav.tabs div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.periods{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.periods button{border:1px solid var(--line);background:var(--panel);color:var(--muted);font:600 13px var(--body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.periods button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.health{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow);margin-bottom:14px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;margin-top:5px;background:var(--up)}
+.dot.warn{background:var(--c-stocks)} .dot.bad{background:var(--down)}
+.health ul{margin:0;padding:0;list-style:none;display:grid;gap:2px}
+.lvl{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;color:#fff;background:var(--muted)}
+.lvl.Rising{background:var(--c-other)} .lvl.Proven{background:var(--up)} .lvl.Veteran{background:var(--c-crypto)}
+.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--panel-2);color:var(--fg)}
+.chip.good{background:color-mix(in srgb,var(--up) 16%,transparent);color:var(--up)}
+.chip.bad{background:color-mix(in srgb,var(--down) 14%,transparent);color:var(--down)}
+.chip.idea{background:color-mix(in srgb,var(--c-stocks) 22%,transparent);color:var(--fg)}
+.addbot{border:2px dashed var(--line);border-radius:18px;padding:18px;display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;color:var(--muted)}
+.addbot .ico{background:var(--panel-2);color:var(--muted)}
+.addbot b{color:var(--fg);display:block;font-size:16px}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.checks li{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start}
+.checks .ck{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:var(--panel-2);color:var(--muted)}
+.checks .ck.ok{background:var(--up);color:#fff}
+.meter{height:8px;border-radius:6px;background:var(--panel-2);overflow:hidden;margin:6px 0 12px}
+.meter i{display:block;height:100%;background:var(--up)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.badge{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--panel-2);font-size:13px;min-width:0}
+.badge .medal{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--muted)}
+.badge.on .medal{background:var(--c-stocks);color:#fff}
+.badge:not(.on){opacity:.7}
+.badge small{display:block;color:var(--muted)}
+.rank{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line)}
+.rank:last-child{border-bottom:0}
+.rank .pos{font:800 18px var(--display);color:var(--muted);text-align:center}
+.rank.top .pos{color:var(--c-stocks)}
+.rank small{display:block;color:var(--muted)}
+.alert-row{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.15)}
+.alert-row:last-child{border-bottom:0}
+nav.tabs button{border:0;background:none;color:var(--muted);font:500 12px var(--body);padding:9px 4px 8px;display:grid;justify-items:center;gap:3px;cursor:pointer}
+nav.tabs button svg{width:26px;height:26px}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+nav.tabs button:disabled{opacity:.45;cursor:default}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;max-width:min(90vw,440px);z-index:6}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font-size:12px;padding:5px 8px;border-radius:8px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.card:hover{transform:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="empty" id="boot"><b>Loading your bots…</b>Numbers come from the bots on your PC.</div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<nav class="tabs" aria-label="Sections"><div>
+  <button id="t-bots" data-go="bots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="7" width="16" height="12" rx="3"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/><path d="M12 7V4M10 4h4"/></svg>Bots</button>
+  <button id="t-fortune" data-go="fortune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.8-1.5-1.3-2.8-1.3-1.7 0-2.8.9-2.8 2.1 0 2.9 5.8 1.4 5.8 4.2 0 1.2-1.2 2.1-3 2.1-1.4 0-2.5-.6-3-1.5M12 6.2v1.7M12 16.3v1.6"/></svg>Fortune</button>
+  <button id="t-ranks" data-go="ranks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7l-1-3h-5z"/></svg>Ranks</button>
+  <button id="t-stats" data-go="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>Statistics</button>
+  <button id="t-refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4h-4"/></svg>Refresh</button>
+</div></nav>
+
+<script>
+(() => {
+const $ = (s, el = document) => el.querySelector(s);
+const app = $("#app");
+const state = { summary: null, bots: {}, mode: "paper", period: "all", view: "bots", loadErr: null };
+try { const m = localStorage.getItem("be-mode"); if (m === "real" || m === "paper") state.mode = m; } catch (e) {}
+try { const p = localStorage.getItem("be-period"); if (["today", "7d", "30d", "ytd", "all"].includes(p)) state.period = p; } catch (e) {}
+const PERIODS = [["today", "Today"], ["7d", "Week"], ["30d", "Month"], ["ytd", "This year"], ["all", "All time"]];
+const plabel = () => ({ today: "today", "7d": "last 7 days", "30d": "last 30 days", ytd: "this year", all: "all time" })[state.period];
+/* profit for the chosen period: today → today field, else periods[k] (falls back to all-time pnl) */
+const pp = (o, k = state.period) => !o ? null : k === "today" ? o.today ?? null : (o.periods?.[k] ?? (k === "all" ? o.pnl : null));
+function periodSwitch(skipToday) {
+  return `<div class="periods" role="group" aria-label="Time period">${PERIODS.filter(p => !(skipToday && p[0] === "today"))
+    .map(([k, l]) => `<button id="p-${k}" data-period="${k}" aria-pressed="${state.period === k}">${l}</button>`).join("")}</div>`;
+}
+function bindPeriod() {
+  app.querySelectorAll("[data-period]").forEach(b => b.addEventListener("click", () => {
+    state.period = b.dataset.period; try { localStorage.setItem("be-period", state.period); } catch (e) {} render();
+  }));
+}
+
+const CAT = { Stocks: "var(--c-stocks)", Crypto: "var(--c-crypto)", "Sports bets": "var(--c-sports)" };
+const catColor = c => CAT[c] || "var(--c-other)";
+const ICONS = {
+  stocks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 4 3 7-8"/><path d="M15 7h5v5"/></svg>',
+  crypto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h5a3 3 0 0 1 0 6H9zM9 12h6a3 3 0 0 1 0 6H9zM9 6v12M11 4v2M11 18v2M7 6h2M7 18h2"/></svg>',
+  nfl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-35 12 12)"/><path d="M9.5 14.5l5-5M10.5 11.5l2 2M12 10l2 2"/></svg>',
+  bot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V5"/></svg>'
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (v, dp) => {
+  if (v == null || isNaN(v)) return "—";
+  const a = Math.abs(v), d = dp ?? (a >= 1000 ? 0 : 2);
+  return (v < 0 ? "-$" : "$") + a.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+};
+const smoney = v => v == null || isNaN(v) ? "—" : (v > 0 ? "+" : "") + money(v);
+const pct = (v, dp = 2) => v == null || isNaN(v) ? "—" : (v > 0 ? "+" : "") + (v * 100).toFixed(dp) + "%";
+const plain = (v, dp = 0) => v == null || isNaN(v) ? "—" : (v * 100).toFixed(dp) + "%";
+const cls = v => v == null || isNaN(v) || Math.abs(v) < 1e-9 ? "flat" : v > 0 ? "up" : "down";
+const ago = ts => {
+  if (!ts) return "never";
+  const t = new Date(ts.length <= 16 ? ts + ":00Z" : ts); const m = (Date.now() - t) / 60000;
+  if (isNaN(m)) return "—";
+  if (m < 2) return "just now"; if (m < 60) return Math.round(m) + " min ago";
+  if (m < 48 * 60) return Math.round(m / 60) + " h ago"; return Math.round(m / 1440) + " days ago";
+};
+const when = ts => { if (!ts) return "—"; const t = new Date(ts.length <= 16 ? ts + ":00Z" : ts);
+  return t.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 4200); }
+
+/* ---------------- routing ---------------- */
+function route() {
+  const h = (location.hash || "").slice(1);
+  state.view = h.startsWith("bot-") ? h : (["bots", "fortune", "ranks", "stats"].includes(h) ? h : "bots");
+  render();
+}
+window.addEventListener("hashchange", route);
+document.querySelectorAll("nav [data-go]").forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.go; }));
+
+/* ---------------- shared bits ---------------- */
+function modeSwitch() {
+  const t = state.summary?.totals || {};
+  return `<div class="seg" role="group" aria-label="Money type">
+    <button id="m-paper" data-mode="paper" aria-pressed="${state.mode === "paper"}">Paper · ${t.paper?.bots ?? 0}</button>
+    <button id="m-real" data-mode="real" aria-pressed="${state.mode === "real"}">Real money · ${t.real?.bots ?? 0}</button></div>`;
+}
+function bindMode() {
+  app.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => {
+    state.mode = b.dataset.mode; try { localStorage.setItem("be-mode", state.mode); } catch (e) {} render();
+  }));
+}
+const botsInMode = () => (state.summary?.bots || []).filter(b => b.mode === state.mode);
+const updatedLine = () => state.summary ? `<p class="note" style="margin:14px 4px 0">Numbers from your PC · sent ${esc(ago(state.summary.generated))}${state.summary.errors?.length ? ` · <span class="down">${state.summary.errors.length} bot couldn't be read</span>` : ""}</p>` : "";
+const emptyMode = () => state.mode === "real"
+  ? `<div class="empty"><b>No real-money bots yet</b>Every bot is still on paper. When one goes live, it moves here with its own totals.</div>`
+  : `<div class="empty"><b>No paper bots found</b>Bots show up here on the next refresh from your PC.</div>`;
+
+/* ---------------- health strip ---------------- */
+function healthStrip() {
+  const s = state.summary, list = s.bots || [];
+  const genAge = (Date.now() - new Date(s.generated)) / 3.6e6;
+  const items = [];
+  if (genAge > 3) items.push(["bad", `Last update from your PC was ${ago(s.generated)}. The PC may be asleep or off.`]);
+  list.forEach(b => { if (b.health && b.health.status !== "ok") items.push([b.health.status, `${b.name}: ${b.health.text}`]); });
+  (s.errors || []).forEach(e => items.push(["bad", "Couldn't read " + e]));
+  const worst = items.some(i => i[0] === "bad") ? "bad" : items.length ? "warn" : "ok";
+  return `<div class="health" role="status"><span class="dot ${worst}"></span>${items.length
+    ? `<ul>${items.map(i => `<li class="${i[0] === "bad" ? "down" : ""}">${esc(i[1])}</li>`).join("")}</ul>`
+    : `<span>All ${list.length} bots healthy · PC checked in ${esc(ago(s.generated))}</span>`}</div>`;
+}
+const levelPill = l => l ? `<span class="lvl ${esc(l.name)}">${esc(l.name)}</span>` : "";
+
+/* ---------------- Bots (home) ---------------- */
+function viewBots() {
+  const t = state.summary.totals[state.mode] || {};
+  const list = botsInMode().slice().sort((a, b) => (b.per_hour ?? -1e9) - (a.per_hour ?? -1e9));
+  const cards = list.map(b => {
+    const facts = b.category === "Sports bets"
+      ? `<span>Record ${esc(b.record || "0-0")}</span><span>${b.n_open ?? 0} open bets</span>`
+      : `<span>${b.trades_n ?? 0} trades</span><span>Win ${plain(b.win_rate)}</span><span>Picks right ${plain(b.accuracy)}</span>`;
+    const p = pp(b);
+    const chips = [];
+    if (b.alpha != null) chips.push(`<span class="chip ${b.alpha > 0 ? "good" : "bad"}">${b.alpha > 0 ? "Beating" : "Trailing"} ${esc(b.bench_label)} by ${Math.abs(b.alpha * 100).toFixed(2)}%</span>`);
+    if (b.ready) chips.push(`<span class="chip ${b.ready.ready ? "good" : ""}">Ready ${b.ready.done}/${b.ready.total}</span>`);
+    if (b.badges_total) chips.push(`<span class="chip">Badges ${b.badges}/${b.badges_total}</span>`);
+    if (b.top_shadow) chips.push(`<span class="chip idea">Try “${esc(b.top_shadow.name)}”</span>`);
+    return `<button class="card" data-bot="${esc(b.id)}" aria-label="Open ${esc(b.name)}">
+      <span class="ico" style="background:${catColor(b.category)}">${ICONS[b.icon] || ICONS.bot}</span>
+      <span class="meta">
+        <span class="nm">${esc(b.name)} ${levelPill(b.level)} <span class="pill ${b.mode === "real" ? "real" : ""}">${b.mode === "real" ? "Real" : "Paper"}</span>${b.health?.status === "bad" ? '<span class="pill warn">Check</span>' : ""}</span>
+        <span class="sub">${esc(b.market)}</span>
+        <span class="facts num">${facts}<span>${esc(ago(b.last_update))}</span></span>
+        <span class="rate num ${cls(b.per_hour)}">${b.per_hour == null ? "—" : smoney(b.per_hour)} <small>per hour</small></span>
+        <span class="facts num" style="margin:2px 0 6px"><span>Worth <b style="color:var(--fg)">${money(b.value)}</b></span><span class="${cls(p)}">${p == null ? "—" : smoney(p)} ${plabel()}</span></span>
+        <span class="facts" style="margin:0;gap:6px">${chips.join("")}</span>
+      </span>
+      <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5l7 7-7 7"/></svg></span>
+    </button>`;
+  }).join("");
+  const p = pp(t);
+  const all = state.summary.bots || [];
+  return `<div class="top"><h1>The Bot Barn</h1>${modeSwitch()}</div>
+    ${healthStrip()}
+    <section class="hero"><div class="big">
+      <div class="amt num ${cls(t.per_hour)}">${smoney(t.per_hour)}</div>
+      <div class="lbl ${cls(t.per_hour)}">${state.mode === "real" ? "Real-money" : "Paper"} profit per hour, all bots</div></div>
+      <div class="strip num"><div><small>Profit ${plabel()}</small><b class="${cls(p)}">${p == null ? "—" : smoney(p)}</b></div>
+      <div><small>Worth now</small><b>${money(t.value)}</b></div>
+      <div><small>Started with</small><b>${money(t.budget)}</b></div></div></section>
+    ${periodSwitch()}
+    <div class="section-h"><h2>My bots</h2><span class="num">${all.length} running</span></div>
+    <div class="list">${list.length ? cards : emptyMode()}
+      <div class="addbot"><span class="ico">${ICONS.bot}</span><div><b>Add a bot to the barn</b>Build a new bot with Claude in this project. Once it keeps its records in D:\\TradingBot\\data, it shows up here on its own.</div></div>
+    </div>${updatedLine()}`;
+}
+
+/* ---------------- Fortune ---------------- */
+function viewFortune() {
+  const t = state.summary.totals[state.mode] || {};
+  const cats = Object.entries(t.cats || {}).sort((a, b) => b[1].value - a[1].value);
+  const tot = cats.reduce((s, [, c]) => s + Math.max(c.value, 0), 0) || 1;
+  const k = state.period === "today" ? "all" : state.period;
+  const bar = cats.map(([n, c]) => `<i title="${esc(n)}" style="flex:${Math.max(c.value, 0) / tot};background:${catColor(n)}"></i>`).join("");
+  const cp = c => c.periods?.[k] ?? c.pnl;
+  const tiles = cats.map(([n, c]) => `<div class="tile"><i style="background:${catColor(n)}"></i><div><small>${esc(n)} · ${c.bots} bot${c.bots === 1 ? "" : "s"}</small><b class="num">${money(c.value)}</b><em class="num ${cls(cp(c))}">${smoney(cp(c))} ${plabel()}</em></div></div>`).join("");
+  const bots = botsInMode().filter(b => b.value != null).sort((a, b) => b.value - a.value)
+    .map(b => { const v = pp(b, k); return `<div class="tile"><i style="background:${catColor(b.category)}"></i><div><small>${esc(b.name)}</small><b class="num">${money(b.value)}</b><em class="num ${cls(v)}">${v == null ? "—" : smoney(v)}</em></div></div>`; }).join("");
+  const other = state.mode === "paper" ? state.summary.totals.real : state.summary.totals.paper;
+  const tp = pp(t, k);
+  return `<div class="top"><h1>Fortune</h1>${modeSwitch()}</div>
+    ${periodSwitch(true)}
+    ${t.bots ? `<div class="panel"><div class="num" style="font-family:var(--display);font-weight:800;font-size:clamp(34px,10vw,46px);line-height:1">${money(t.value)}</div>
+      <div class="note" style="margin-top:6px">${state.mode === "real" ? "Real money" : "Paper money"} across ${t.bots} bot${t.bots === 1 ? "" : "s"} · started with ${money(t.budget)} · <span class="${cls(tp)}">${smoney(tp)} ${plabel()}</span></div>
+      <div class="bar" aria-hidden="true">${bar}</div><div class="tiles">${tiles}</div></div>
+      <div class="section-h"><h2>By bot</h2></div><div class="tiles">${bots}</div>` : emptyMode()}
+    <div class="section-h"><h2>${state.mode === "paper" ? "Real money" : "Paper"}</h2></div>
+    <div class="tiles"><div class="tile"><i style="background:var(--accent)"></i><div><small>Kept separate</small><b class="num">${money(other?.value)}</b><em class="num ${cls(other?.pnl)}">${other?.bots ? smoney(other.pnl) : "no bots yet"}</em></div></div></div>
+    ${updatedLine()}`;
+}
+
+/* ---------------- Ranks (leaderboard) ---------------- */
+function viewRanks() {
+  const k = state.period === "today" ? "all" : state.period;
+  const rows = (state.summary.leaderboard || []).filter(r => r.mode === state.mode)
+    .map(r => ({ ...r, score: k === "all" ? r.ret * 100 : r.periods?.[k] }))
+    .filter(r => r.score != null).sort((a, b) => b.score - a.score);
+  const fmt = r => k === "all" ? pct(r.ret) : smoney(r.score);
+  return `<div class="top"><h1>Ranks</h1>${modeSwitch()}</div>
+    ${periodSwitch(true)}
+    <p class="note" style="margin:0 4px 12px">Every bot and every shadow strategy, each started with the same ${money(100, 0)}. A new bot has to climb past these to earn its spot.</p>
+    ${rows.length ? `<div class="panel">${rows.map((r, i) => `<div class="rank ${i < 3 ? "top" : ""}">
+      <span class="pos num">${i + 1}</span>
+      <span style="min-width:0"><b>${esc(r.name)}</b> ${r.kind === "bot" ? `<span class="pill real">Live bot</span>` : ""}${r.streak >= 2 ? ` <span class="chip idea">beat the bot ${r.streak} wks</span>` : ""}
+        <small>${r.kind === "bot" ? esc(r.category) : "Shadow of " + esc(r.bot)}</small></span>
+      <b class="num ${cls(r.score)}">${fmt(r)}</b></div>`).join("")}</div>` : emptyMode()}
+    ${updatedLine()}`;
+}
+
+/* ---------------- Statistics ---------------- */
+function viewStats() {
+  const list = botsInMode();
+  const sum = (key) => list.reduce((s, b) => s + (b[key] || 0), 0);
+  const traders = list.filter(b => b.category !== "Sports bets");
+  const closed = sum("sells"), wins = sum("wins");
+  const acc = traders.filter(b => b.accuracy != null);
+  const k = state.period;
+  const byP = list.map(b => ({ b, p: pp(b, k) })).filter(x => x.p != null).sort((a, b) => b.p - a.p);
+  const best = byP[0], worst = byP[byP.length - 1];
+  const t = state.summary.totals[state.mode] || {};
+  const cats = Object.entries(t.cats || {});
+  const row = (l, v, c = "") => `<div class="row"><span>${l}</span><b class="num ${c}">${v}</b></div>`;
+  const fees = traders.reduce((s, b) => s + (b.fees || 0), 0);
+  const ck = k === "today" ? "all" : k;
+  const al = state.summary.alerts || [];
+  const lim = state.summary.limits?.alerts;
+  return `<div class="top"><h1>Statistics</h1>${modeSwitch()}</div>
+    ${periodSwitch()}
+    ${list.length ? `<section class="stats"><h2>Statistics</h2>
+      ${row("Number of bots", list.length)}
+      ${row("Trades & bets placed", sum("trades_n"))}
+      ${row("Closed trades & settled bets", closed)}
+      ${row("Win rate", closed ? plain(wins / closed) : "—")}
+      ${row("Prediction accuracy", acc.length ? plain(acc.reduce((s, b) => s + b.accuracy, 0) / acc.length, 1) : "—")}
+      ${best ? row("Best bot " + plabel(), esc(best.b.name) + " · " + smoney(best.p), cls(best.p)) : ""}
+      ${worst && worst !== best ? row("Worst bot " + plabel(), esc(worst.b.name) + " · " + smoney(worst.p), cls(worst.p)) : ""}
+      <h4>Earned ${plabel()}</h4>
+      ${row("All bots", smoney(pp(t, k)), cls(pp(t, k)))}
+      ${k === "today" ? "" : cats.map(([n, c]) => row(esc(n), smoney(c.periods?.[ck] ?? c.pnl), cls(c.periods?.[ck] ?? c.pnl))).join("")}
+      <h4>Right now</h4>
+      ${row("Locked in (closed trades)", smoney(sum("realized")), cls(sum("realized")))}
+      ${row("On paper (open positions)", smoney(sum("unrealized")), cls(sum("unrealized")))}
+      ${fees ? row("Estimated fees", money(-fees), "down") : ""}
+      <h4>Beat the market</h4>
+      ${traders.map(b => row(esc(b.name) + " vs " + esc(b.bench_label), (b.alpha > 0 ? "+" : "") + (b.alpha * 100).toFixed(2) + " pts", cls(b.alpha))).join("") || row("No trading bots", "—")}
+      <h4>Phone alerts</h4>
+      <p style="margin:0 0 6px;opacity:.9;font-size:14px">${state.summary.alerts_on ? "On. Pushes go to your ntfy app." : "Not sending yet: add your ntfy channel name to weekly_report.json. Alerts still show here."}${lim ? ` Fires on a drop over ${(lim.day_drop.Stocks * 100).toFixed(0)}% (stocks) or ${(lim.day_drop.Crypto * 100).toFixed(0)}% (crypto) in a day, ${lim.losing_streak} losses in a row, a stalled bot, a settled NFL bet, a new milestone, or a shadow beating the bot ${lim.shadow_streak_weeks}+ weeks.` : ""}</p>
+      ${al.length ? al.slice(0, 10).map(a => `<div class="alert-row"><b>${esc(a.title)}</b><br><span style="opacity:.85;font-size:14px">${esc(a.body)}</span><br><small style="opacity:.7">${esc(when(a.ts))}${a.sent ? " · sent to phone" : ""}</small></div>`).join("") : `<p style="margin:0;opacity:.8;font-size:14px">No alerts yet.</p>`}
+    </section>` : emptyMode()}${updatedLine()}`;
+}
+
+/* ---------------- Chart ---------------- */
+function lineChart(curve, benchLabel) {
+  if (!curve || curve.length < 2) return `<p class="note">The chart fills in after a few updates.</p>`;
+  const W = 600, H = 220, L = 46, R = 10, T = 12, B = 26;
+  const vals = curve.flatMap(p => [p.v, p.b]).filter(v => v != null);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.12 || 1; lo -= pad; hi += pad;
+  const x = i => L + (i / (curve.length - 1)) * (W - L - R), y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  const path = k => curve.map((p, i) => p[k] == null ? null : `${x(i).toFixed(1)},${y(p[k]).toFixed(1)}`).filter(Boolean).join(" L");
+  const ticks = [0, 0.5, 1].map(f => lo + pad + f * (hi - lo - 2 * pad));
+  const last = curve[curve.length - 1];
+  const fmtD = t => new Date(t + ":00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const area = `M${x(0)},${H - B} L${path("v")} L${x(curve.length - 1)},${H - B} Z`;
+  return `<div class="chart" style="position:relative"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bot value over time">
+    ${ticks.map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${money(v)}</text>`).join("")}
+    <text x="${L}" y="${H - 6}" font-size="11" fill="var(--muted)">${fmtD(curve[0].t)}</text>
+    <text x="${W - R}" y="${H - 6}" font-size="11" fill="var(--muted)" text-anchor="end">${fmtD(last.t)}</text>
+    <path d="${area}" fill="var(--accent)" fill-opacity=".1"/>
+    ${curve.some(p => p.b != null) ? `<path d="M${path("b")}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 4"/>` : ""}
+    <path d="M${path("v")}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="${x(curve.length - 1)}" cy="${y(last.v)}" r="4.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="2"/>
+    <line class="hl" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>
+    <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent"/>
+  </svg><div class="tip" hidden></div></div>
+  <div class="legend"><span><i style="background:var(--accent)"></i>Bot</span>${curve.some(p => p.b != null) ? `<span><i style="background:var(--muted)"></i>${esc(benchLabel)} with the same start</span>` : ""}</div>`;
+}
+function bindChart(curve, benchLabel) {
+  const box = app.querySelector(".chart"); if (!box || !curve || curve.length < 2) return;
+  const svg = box.querySelector("svg"), tip = box.querySelector(".tip"), hl = svg.querySelector(".hl");
+  const move = ev => {
+    const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * 600;
+    const i = Math.max(0, Math.min(curve.length - 1, Math.round((sx - 46) / (600 - 56) * (curve.length - 1))));
+    const p = curve[i], px = 46 + i / (curve.length - 1) * 544;
+    hl.setAttribute("x1", px); hl.setAttribute("x2", px); hl.setAttribute("visibility", "visible");
+    tip.textContent = `${when(p.t)} · Bot ${money(p.v)}${p.b != null ? ` · ${benchLabel} ${money(p.b)}` : ""}`;
+    tip.hidden = false;
+    const left = Math.min(Math.max(px / 600 * r.width - tip.offsetWidth / 2, 0), r.width - tip.offsetWidth);
+    tip.style.left = left + "px"; tip.style.top = "0px";
+  };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerleave", () => { tip.hidden = true; hl.setAttribute("visibility", "hidden"); });
+}
+
+/* ---------------- Bot detail ---------------- */
+function table(head, rows) {
+  return `<div class="tbl"><table><thead><tr>${head.map(h => `<th class="${h[1] || ""}">${h[0]}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+}
+function viewBot(id) {
+  const s = (state.summary?.bots || []).find(b => b.id === id);
+  const d = state.bots[id];
+  const head = `<button class="back" id="back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 5l-7 7 7 7"/></svg>${esc(s?.name || "Bot")}</button>`;
+  if (!s) return head + `<div class="empty"><b>This bot isn't in the latest update</b>It may have been renamed or removed on your PC.</div>`;
+  if (!d) return head + `<div class="empty"><b>Loading ${esc(s.name)}…</b></div>`;
+  if (d.error) return head + `<div class="empty"><b>No numbers yet</b>${esc(d.error)}</div>`;
+  const kv = (l, v, c = "") => `<div><small>${l}</small><b class="num ${c}">${v}</b></div>`;
+  const top = `<div class="panel stack">
+    <div><span class="pill ${d.mode === "real" ? "real" : ""}">${d.mode === "real" ? "Real money" : "Paper money"}</span> <span class="note">${esc(d.market)} · updated ${esc(ago(d.last_update))}</span></div>
+    <div><div class="num" style="font-family:var(--display);font-weight:800;font-size:40px;line-height:1">${money(d.value)}</div>
+    <div class="num ${cls(d.pnl)}" style="font-weight:600;margin-top:4px">${smoney(d.pnl)} (${pct(d.ret)}) since it started with ${money(d.budget)}</div></div>
+    <div class="kv">${kv("Per hour", d.per_hour == null ? "—" : smoney(d.per_hour), cls(d.per_hour))}${d.today != null ? kv("Today", smoney(d.today), cls(d.today)) : ""}
+    ${d.type === "trader" ? kv("Cash", money(d.cash)) + kv("Invested", money(d.invested)) + kv("Locked in", smoney(d.realized), cls(d.realized)) + kv("Open positions", smoney(d.unrealized), cls(d.unrealized)) + kv("Win rate", plain(d.win_rate) + ` <small style="display:inline;color:var(--muted)">(${d.wins}/${d.sells})</small>`) + kv("Picks right", plain(d.accuracy, 1) + ` <small style="display:inline;color:var(--muted)">of ${d.graded}</small>`) + kv("Worst dip", pct(d.max_dd), cls(d.max_dd)) + kv(esc(d.bench_label) + " same period", pct(d.bench_ret), cls(d.bench_ret)) + (d.fees ? kv("Est. fees", money(-d.fees), "down") : "") + kv("Buy bar", d.buy_bar == null ? "—" : Number(d.buy_bar).toFixed(2))
+      : kv("Record", esc(d.record)) + kv("Return on bets", pct(d.roi, 1), cls(d.roi)) + kv("Expected profit", smoney(d.expected_pnl), cls(d.expected_pnl)) + kv("Open bets", `${d.n_open} · ${money(d.staked_open)}`)}
+    </div></div>`;
+  let body = "";
+  if (d.health) body += `<div class="health" style="margin:0"><span class="dot ${esc(d.health.status)}"></span><span>${esc(d.health.text)}</span></div>`;
+  if (d.level) body += `<div class="panel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${levelPill(d.level)}<span class="note">${esc(d.level.basis)}${d.level.next ? ` · next level at ${esc(d.level.next)}` : " · top level"}</span></div></div>`;
+  if (d.readiness) {
+    const R = d.readiness;
+    body += `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><h3>Ready for real money?</h3><b class="num ${R.ready ? "up" : ""}">${R.ready ? "Ready" : `${R.done} of ${R.total}`}</b></div>
+      <div class="meter"><i style="width:${Math.round(R.done / R.total * 100)}%"></i></div>
+      <ul class="checks">${R.checks.map(c => `<li><span class="ck ${c.ok ? "ok" : ""}" aria-label="${c.ok ? "done" : "not yet"}">${c.ok ? "✓" : ""}</span><span><b>${esc(c.label)}</b><br><small class="note">${esc(c.detail)}</small></span></li>`).join("")}</ul>
+      <p class="note" style="margin:10px 0 0">${R.ready ? "Every check is green. Going live is still your call." : "Keep it on paper until every check is green."}</p></div>`;
+  }
+  if (d.milestones?.length) body += `<div class="panel"><h3 style="margin-bottom:10px">Milestones · ${d.milestones.filter(m => m.earned).length}/${d.milestones.length}</h3><div class="badges">${d.milestones.map(m => `<div class="badge ${m.earned ? "on" : ""}"><span class="medal"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg></span><span style="min-width:0"><b>${esc(m.label)}</b><small>${m.earned ? "Unlocked" : esc(m.progress || "Not yet")}</small></span></div>`).join("")}</div></div>`;
+  if (d.type === "trader") {
+    const wk = d.weeks || [];
+    body += `<div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><h3>Beat the market</h3><b class="num ${cls(d.alpha)}">${d.alpha == null ? "—" : (d.alpha > 0 ? "+" : "") + (d.alpha * 100).toFixed(2) + " pts"}</b></div>
+      <p class="note" style="margin:6px 0 8px">Bot ${pct(d.ret)} vs ${pct(d.bench_ret)} from just holding ${esc(d.bench_label)} since it started.</p>
+      ${wk.length ? table([["Week ending"], ["Bot", "r"], [esc(d.bench_label), "r"], ["Edge", "r"]], wk.map(w => `<tr><td>${esc(new Date(w.end + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }))}</td><td class="r ${cls(w.bot)}">${pct(w.bot)}</td><td class="r">${pct(w.bench)}</td><td class="r ${cls((w.bot ?? 0) - (w.bench ?? 0))}">${w.bot == null || w.bench == null ? "—" : ((w.bot - w.bench) * 100).toFixed(2) + " pts"}</td></tr>`))
+        : `<p class="note" style="margin:0">Week-by-week results start after 7 full days.</p>`}</div>`;
+  }
+  if (d.type === "trader") {
+    body += `<div class="panel"><h3 style="margin-bottom:8px">Value over time</h3>${lineChart(d.curve, d.bench_label)}</div>`;
+    body += `<div class="panel"><h3 style="margin-bottom:8px">Holding now</h3>${d.holdings.length ? table([["Asset"], ["Cost", "r"], ["Worth", "r"], ["Gain", "r"], ["Days", "r"]],
+      d.holdings.map(h => `<tr><td><b>${esc(h.symbol)}</b></td><td class="r">${money(h.cost)}</td><td class="r">${money(h.value)}</td><td class="r ${cls(h.pnl)}">${smoney(h.pnl)}<br><small>${pct(h.ret)}</small></td><td class="r">${h.days}</td></tr>`)) : `<p class="note">All cash right now.</p>`}</div>`;
+    body += `<div class="panel"><h3 style="margin-bottom:8px">Recent trades</h3>${d.trades.length ? table([["When"], ["Trade"], ["Amount", "r"], ["Result", "r"]],
+      d.trades.map(t => `<tr><td>${esc(when(t.ts))}</td><td><b class="${t.side === "buy" ? "" : "num"}">${t.side === "buy" ? "Bought" : "Sold"} ${esc(t.symbol)}</b><br><small class="note">${esc(t.reason || "")}</small></td><td class="r">${money(t.amount)}</td><td class="r ${cls(t.pnl)}">${t.pnl == null ? "—" : smoney(t.pnl)}</td></tr>`)) : `<p class="note">No trades yet. Nothing has cleared the buy bar.</p>`}</div>`;
+    if (d.shadows?.length) {
+      const promo = d.shadows.filter(s => s.streak >= 2).sort((a, b) => b.streak - a.streak)[0];
+      body += `<div class="panel"><h3 style="margin-bottom:8px">Shadow strategies</h3>
+      ${promo ? `<div class="health" style="box-shadow:none;background:color-mix(in srgb,var(--c-stocks) 18%,transparent)"><span class="dot warn"></span><span><b>Worth a look: “${esc(promo.name)}”.</b> It beat the live bot ${promo.streak} weeks in a row, by ${(promo.beat_by * 100).toFixed(2)}% a week on average. Ask Claude to test switching the bot to these rules.</span></div>` : ""}
+      <p class="note" style="margin:0 0 6px">Practice versions of the bot with different rules, each started with ${money(d.budget)}. A strategy that beats the live bot 2+ weeks running gets flagged.</p>${table([["Strategy"], ["Worth", "r"], ["Return", "r"], ["Wins", "r"], ["Beat bot", "r"]],
+      d.shadows.map((s, i) => `<tr><td><b>${i + 1}. ${esc(s.name)}</b><br><small class="note">${esc(s.desc)}</small></td><td class="r">${money(s.value)}</td><td class="r ${cls(s.ret)}">${pct(s.ret)}</td><td class="r">${s.closed ? plain(s.win_rate) : "—"}</td><td class="r">${s.streak ? s.streak + " wk" + (s.streak > 1 ? "s" : "") : "—"}</td></tr>`))}</div>`;
+    }
+    if (d.kinds?.length) body += `<div class="panel"><h3 style="margin-bottom:8px">By type of asset</h3>${table([["Type"], ["Picks right", "r"], ["Trades", "r"], ["Profit", "r"]],
+      d.kinds.map(k => `<tr><td><b>${esc(k.name)}</b><br><small class="note">${k.held} held</small></td><td class="r">${plain(k.acc)}<br><small class="note">of ${k.n}</small></td><td class="r">${k.trades}</td><td class="r ${cls(k.realized + k.unrealized)}">${smoney(k.realized + k.unrealized)}</td></tr>`))}</div>`;
+    if (d.experts?.length) body += `<div class="panel"><h3 style="margin-bottom:8px">Who the bot trusts</h3>${d.experts.map(e => `<div style="display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:8px 0"><span>${esc(e.name)} <small class="note">right ${plain(e.hit)}</small></span><b class="num">${plain(e.weight)}</b><span style="grid-column:1/-1;height:6px;border-radius:4px;background:var(--panel-2)"><span style="display:block;height:6px;border-radius:4px;background:var(--accent);width:${Math.round((e.weight || 0) * 100)}%"></span></span></div>`).join("")}</div>`;
+    if (d.daily?.length) body += `<div class="panel"><h3 style="margin-bottom:8px">Day by day</h3>${table([["Day"], ["Closed at", "r"], ["Change", "r"]],
+      d.daily.slice().reverse().map(x => `<tr><td>${esc(new Date(x.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }))}</td><td class="r">${money(x.close)}</td><td class="r ${cls(x.chg)}">${smoney(x.chg)}</td></tr>`))}</div>`;
+    if (d.events?.length) body += `<div class="panel"><h3 style="margin-bottom:8px">Bot log</h3>${d.events.map(e => `<p style="margin:6px 0;font-size:14px"><span class="note">${esc(when(e.ts))}</span> <span class="${e.level === "error" ? "down" : ""}">${esc(e.msg)}</span></p>`).join("")}</div>`;
+  } else {
+    body += `<div class="panel"><h3 style="margin-bottom:8px">Bets</h3>${d.bets.length ? table([["Bet"], ["Price", "r"], ["Model", "r"], ["Stake", "r"], ["Result", "r"]],
+      d.bets.map(b => `<tr><td><b>${esc(b.label)}</b><br><small class="note">${esc(b.game)} · ${esc(b.type)} · ${esc(when(b.kickoff))}</small></td><td class="r">${Math.round(b.cost * 100)}¢</td><td class="r">${Math.round(b.p * 100)}%</td><td class="r">${money(b.stake)}</td><td class="r ${cls(b.pnl)}">${b.result == null ? "Open" : b.result === "void" ? "Void" : smoney(b.pnl)}</td></tr>`)) : `<p class="note">No bets yet.</p>`}</div>`;
+    const grp = (title, g) => g?.length ? `<div class="panel"><h3 style="margin-bottom:8px">${title}</h3>${table([[""], ["W-L", "r"], ["Open", "r"], ["Profit", "r"], ["Avg edge", "r"]],
+      g.map(x => `<tr><td><b>${esc(x.name)}</b></td><td class="r">${x.w}-${x.l}</td><td class="r">${x.open}</td><td class="r ${cls(x.pnl)}">${smoney(x.pnl)}</td><td class="r">${pct(x.edge, 1)}</td></tr>`))}</div>` : "";
+    body += grp("By bet type", d.by_type) + grp("Singles vs parlays", d.by_kind) + grp("By price", d.by_price);
+    if (d.page) body += `<p style="margin:4px"><a class="link" href="${esc(d.page)}" target="_blank" rel="noopener">Open the scanner's own report ↗</a></p>`;
+  }
+  return head + `<div class="stack">${top}${body}</div>`;
+}
+
+/* ---------------- render ---------------- */
+function render() {
+  document.querySelectorAll("nav [data-go]").forEach(b => b.toggleAttribute("aria-current", false));
+  const tab = state.view.startsWith("bot-") ? "bots" : state.view;
+  $("#t-" + tab)?.setAttribute("aria-current", "page");
+  if (!state.summary) {
+    app.innerHTML = state.loadErr
+      ? `<div class="empty"><b>Can't load your bots</b>${esc(state.loadErr)}</div>`
+      : !state.tried ? `<div class="empty"><b>Loading your bots…</b></div>` : `<div class="empty"><b>Waiting for the first update</b>The tracker fills in after your PC sends its first numbers. Your PC sends numbers about every 30 minutes while the bots run.</div>`;
+    return;
+  }
+  if (state.view.startsWith("bot-")) {
+    const id = state.view.slice(4); watchBot(id);
+    app.innerHTML = viewBot(id);
+    $("#back")?.addEventListener("click", () => { history.length > 1 ? history.back() : (location.hash = "bots"); });
+    const d = state.bots[id]; if (d?.curve) bindChart(d.curve, d.bench_label);
+    return;
+  }
+  app.innerHTML = state.view === "fortune" ? viewFortune() : state.view === "stats" ? viewStats() : state.view === "ranks" ? viewRanks() : viewBots();
+  bindMode(); bindPeriod();
+  app.querySelectorAll("[data-bot]").forEach(c => c.addEventListener("click", () => { location.hash = "bot-" + c.dataset.bot; }));
+}
+
+/* ---------------- data (files published from the PC) ---------------- */
+const noStore = { cache: "no-store" };
+let loading = null;
+async function loadSummary(manual) {
+  if (loading) return loading;
+  loading = (async () => {
+    try {
+      const r = await fetch("data/summary.json?t=" + Date.now(), noStore);
+      if (!r.ok) throw new Error(r.status === 404 ? "No numbers published yet." : "Server said " + r.status);
+      const s = await r.json();
+      const changed = !state.summary || s.generated !== state.summary.generated;
+      state.summary = s; state.loadErr = null;
+      if (changed) { state.bots = {}; }
+      if (state.view.startsWith("bot-")) await loadBot(state.view.slice(4));
+      render();
+      if (manual) toast(changed ? "Updated with the latest numbers." : "Already up to date. Your PC sends new numbers about every 30 minutes.");
+    } catch (e) {
+      if (!state.summary) { state.loadErr = navigator.onLine ? "Couldn't load the numbers. " + e.message : "You're offline. Connect and tap Refresh."; render(); }
+      else if (manual) toast(navigator.onLine ? "Couldn't refresh right now. Showing the last numbers." : "You're offline. Showing the last numbers.");
+    } finally { loading = null; state.tried = true; if (!state.summary) render(); }
+  })();
+  return loading;
+}
+async function loadBot(id) {
+  if (state.bots[id]) return;
+  try {
+    const r = await fetch("data/bots/" + encodeURIComponent(id) + ".json?v=" + encodeURIComponent(state.summary?.generated || ""), noStore);
+    state.bots[id] = r.ok ? await r.json() : { error: "No details stored for this bot yet." };
+  } catch (e) { state.bots[id] = { error: "Couldn't load this bot's details." }; }
+}
+function watchBot(id) {
+  if (!state.bots[id] && !watchBot.busy?.[id]) {
+    (watchBot.busy ||= {})[id] = true;
+    loadBot(id).then(() => { delete watchBot.busy[id]; if (state.view === "bot-" + id) render(); });
+  }
+}
+route();
+loadSummary();
+setInterval(() => { if (document.visibilityState === "visible") loadSummary(); }, 5 * 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadSummary(); });
+
+/* ---------------- refresh ---------------- */
+const rb = $("#t-refresh");
+rb.addEventListener("click", async () => { rb.disabled = true; await loadSummary(true); rb.disabled = false; });
+
+/* ---------------- offline + install ---------------- */
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+
+</body>
+</html>

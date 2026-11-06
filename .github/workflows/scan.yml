@@ -49,4 +49,5 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add docs state
           git diff --cached --quiet || git commit -m "Report $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase origin main  # the Bot Barn app (docs/bot-barn) also pushes here
           git push
