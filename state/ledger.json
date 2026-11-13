@@ -33,8 +33,10 @@
    "cost": 0.0639,
    "p": 0.1124,
    "stake": 1.28,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -1.28,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-buf-min-2026-11-09-pos-10pt5|short",
@@ -50,8 +52,10 @@
    "cost": 0.101,
    "p": 0.1458,
    "stake": 1.23,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -1.23,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-dal-ind-2026-11-08-pos-9pt5|short",
@@ -67,8 +71,10 @@
    "cost": 0.0851,
    "p": 0.1194,
    "stake": 1.0,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -1.0,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-nyj-kc-2026-11-08-pos-3pt5|long",
@@ -84,8 +90,10 @@
    "cost": 0.2837,
    "p": 0.3689,
    "stake": 2.94,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -2.94,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-gb-ne-2026-11-08-pos-20pt5|short",
@@ -101,8 +109,10 @@
    "cost": 0.0798,
    "p": 0.1029,
    "stake": 1.0,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -1.0,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-hou-lac-2026-11-08-neg-20pt5|long",
@@ -118,8 +128,10 @@
    "cost": 0.1273,
    "p": 0.1462,
    "stake": 1.0,
-   "result": null,
-   "voters": {}
+   "result": "win",
+   "voters": {},
+   "pnl": 6.86,
+   "voters_scored": true
   },
   {
    "key": "asc-nfl-nyg-phi-2026-11-08-neg-16pt5|long",
@@ -135,8 +147,10 @@
    "cost": 0.1484,
    "p": 0.167,
    "stake": 1.0,
-   "result": null,
-   "voters": {}
+   "result": "loss",
+   "voters": {},
+   "pnl": -1.0,
+   "voters_scored": true
   },
   {
    "key": "PARLAY|asc-nfl-buf-min-2026-11-09-pos-10pt5|short+asc-nfl-dal-ind-2026-11-08-pos-9pt5|short+asc-nfl-tb-chi-2026-11-08-neg-9pt5|long",
@@ -164,7 +178,8 @@
    "cost": 0.00055,
    "p": 0.00196,
    "stake": 1.0,
-   "result": null
+   "result": "loss",
+   "pnl": -1.0
   },
   {
    "key": "PARLAY|asc-nfl-buf-min-2026-11-09-pos-10pt5|short+asc-nfl-nyj-kc-2026-11-08-pos-3pt5|long+asc-nfl-tb-chi-2026-11-08-neg-9pt5|long",
@@ -192,7 +207,8 @@
    "cost": 0.00183,
    "p": 0.00604,
    "stake": 1.0,
-   "result": null
+   "result": "loss",
+   "pnl": -1.0
   },
   {
    "key": "PARLAY|asc-nfl-dal-ind-2026-11-08-pos-9pt5|short+asc-nfl-gb-ne-2026-11-08-pos-20pt5|short+asc-nfl-nyj-kc-2026-11-08-pos-3pt5|long",
@@ -219,6 +235,154 @@
    "kickoff": "2026-11-08T21:25:00+00:00",
    "cost": 0.00193,
    "p": 0.00453,
+   "stake": 1.0,
+   "result": "loss",
+   "pnl": -1.0
+  },
+  {
+   "key": "asc-nfl-lac-bal-2026-11-16-neg-13pt5|long",
+   "kind": "single",
+   "run": "2026-11-12-thu",
+   "label": "LAC -13.5",
+   "game": "LAC @ BAL",
+   "game_slug": "nfl-lac-bal-2026-11-16",
+   "slug": "asc-nfl-lac-bal-2026-11-16-neg-13pt5",
+   "side": "long",
+   "type": "SPREAD",
+   "kickoff": "2026-11-17T01:15:00+00:00",
+   "cost": 0.0545,
+   "p": 0.0794,
+   "stake": 1.0,
+   "result": null,
+   "voters": {}
+  },
+  {
+   "key": "asc-nfl-kc-atl-2026-11-15-neg-20pt5|long",
+   "kind": "single",
+   "run": "2026-11-12-thu",
+   "label": "KC -20.5",
+   "game": "KC @ ATL",
+   "game_slug": "nfl-kc-atl-2026-11-15",
+   "slug": "asc-nfl-kc-atl-2026-11-15-neg-20pt5",
+   "side": "long",
+   "type": "SPREAD",
+   "kickoff": "2026-11-15T18:00:00+00:00",
+   "cost": 0.087,
+   "p": 0.1141,
+   "stake": 1.0,
+   "result": null,
+   "voters": {}
+  },
+  {
+   "key": "asc-nfl-buf-nyj-2026-11-15-neg-27pt5|long",
+   "kind": "single",
+   "run": "2026-11-12-thu",
+   "label": "BUF -27.5",
+   "game": "BUF @ NYJ",
+   "game_slug": "nfl-buf-nyj-2026-11-15",
+   "slug": "asc-nfl-buf-nyj-2026-11-15-neg-27pt5",
+   "side": "long",
+   "type": "SPREAD",
+   "kickoff": "2026-11-15T18:00:00+00:00",
+   "cost": 0.0762,
+   "p": 0.0979,
+   "stake": 1.0,
+   "result": null,
+   "voters": {}
+  },
+  {
+   "key": "asc-nfl-sf-dal-2026-11-15-neg-17pt5|long",
+   "kind": "single",
+   "run": "2026-11-12-thu",
+   "label": "SF -17.5",
+   "game": "SF @ DAL",
+   "game_slug": "nfl-sf-dal-2026-11-15",
+   "slug": "asc-nfl-sf-dal-2026-11-15-neg-17pt5",
+   "side": "long",
+   "type": "SPREAD",
+   "kickoff": "2026-11-15T21:25:00+00:00",
+   "cost": 0.1461,
+   "p": 0.1695,
+   "stake": 1.0,
+   "result": null,
+   "voters": {}
+  },
+  {
+   "key": "PARLAY|asc-nfl-buf-nyj-2026-11-15-neg-27pt5|long+asc-nfl-kc-atl-2026-11-15-neg-20pt5|long+asc-nfl-lac-bal-2026-11-16-neg-13pt5|long",
+   "kind": "parlay",
+   "run": "2026-11-12-thu",
+   "label": "LAC -13.5 + KC -20.5 + BUF -27.5",
+   "legs": [
+    {
+     "game_slug": "nfl-lac-bal-2026-11-16",
+     "slug": "asc-nfl-lac-bal-2026-11-16-neg-13pt5",
+     "side": "long"
+    },
+    {
+     "game_slug": "nfl-kc-atl-2026-11-15",
+     "slug": "asc-nfl-kc-atl-2026-11-15-neg-20pt5",
+     "side": "long"
+    },
+    {
+     "game_slug": "nfl-buf-nyj-2026-11-15",
+     "slug": "asc-nfl-buf-nyj-2026-11-15-neg-27pt5",
+     "side": "long"
+    }
+   ],
+   "kickoff": "2026-11-17T01:15:00+00:00",
+   "cost": 0.00036,
+   "p": 0.00089,
+   "stake": 1.0,
+   "result": null
+  },
+  {
+   "key": "PARLAY|asc-nfl-kc-atl-2026-11-15-neg-20pt5|long+asc-nfl-lac-bal-2026-11-16-neg-13pt5|long+asc-nfl-sf-dal-2026-11-15-neg-17pt5|long",
+   "kind": "parlay",
+   "run": "2026-11-12-thu",
+   "label": "LAC -13.5 + KC -20.5 + SF -17.5",
+   "legs": [
+    {
+     "game_slug": "nfl-lac-bal-2026-11-16",
+     "slug": "asc-nfl-lac-bal-2026-11-16-neg-13pt5",
+     "side": "long"
+    },
+    {
+     "game_slug": "nfl-kc-atl-2026-11-15",
+     "slug": "asc-nfl-kc-atl-2026-11-15-neg-20pt5",
+     "side": "long"
+    },
+    {
+     "game_slug": "nfl-sf-dal-2026-11-15",
+     "slug": "asc-nfl-sf-dal-2026-11-15-neg-17pt5",
+     "side": "long"
+    }
+   ],
+   "kickoff": "2026-11-17T01:15:00+00:00",
+   "cost": 0.00069,
+   "p": 0.00153,
+   "stake": 1.0,
+   "result": null
+  },
+  {
+   "key": "PARLAY|asc-nfl-buf-nyj-2026-11-15-neg-27pt5|long+asc-nfl-sf-dal-2026-11-15-neg-17pt5|long",
+   "kind": "parlay",
+   "run": "2026-11-12-thu",
+   "label": "BUF -27.5 + SF -17.5",
+   "legs": [
+    {
+     "game_slug": "nfl-buf-nyj-2026-11-15",
+     "slug": "asc-nfl-buf-nyj-2026-11-15-neg-27pt5",
+     "side": "long"
+    },
+    {
+     "game_slug": "nfl-sf-dal-2026-11-15",
+     "slug": "asc-nfl-sf-dal-2026-11-15-neg-17pt5",
+     "side": "long"
+    }
+   ],
+   "kickoff": "2026-11-15T21:25:00+00:00",
+   "cost": 0.01113,
+   "p": 0.01659,
    "stake": 1.0,
    "result": null
   }
